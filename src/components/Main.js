@@ -1,30 +1,49 @@
-import React , { Component } from 'react';
+import React, { Component } from 'react';
 
-// form
-import { FaPlus } from 'react-icons/fa'
-import { FaEdit, FaWindowClose } from 'react-icons/fa'
-import './Main.css'
+import './Main.css';
 
-export default class Main extends Component{
+import Form from './Form';
+
+import Tarefas from './Tarefas';
+
+export default class Main extends Component {
   state = {
     novaTarefa: '',
     tarefas: [],
     index: -1,
   };
 
-  handleChange = (e) =>{
+  componentDidMount() {
+    const tarefas = JSON.parse(localStorage.getItem('tarefas'));
+
+    if (!tarefas) return;
+
+    this.setState({ tarefas })
+  }
+
+  componentDidUpdate(prevState, prevPropos) {
+    const { tarefas } = this.state;
+
+    if (tarefas === prevState.tarefas) return;
+
+    localStorage.setItem('tarefas', JSON.stringify(tarefas));
+  }
+
+
+
+  handleChange = (e) => {
     this.setState({
       novaTarefa: e.target.value,
     });
   };
 
-  handleSubmit = (e)=>{
+  handleSubmit = (e) => {
     e.preventDefault();
-    const {tarefas, index} = this.state;
-    let {novaTarefa} = this.state;
-    novaTarefa =  novaTarefa.trim();
+    const { tarefas, index } = this.state;
+    let { novaTarefa } = this.state;
+    novaTarefa = novaTarefa.trim();
 
-    if(!novaTarefa)return;
+    if (!novaTarefa) return;
     if (tarefas.indexOf(novaTarefa) !== -1) return;
 
     const novaTarefas = [...tarefas]
@@ -32,10 +51,10 @@ export default class Main extends Component{
     if (index === -1) {
       this.setState({
         tarefas: [...novaTarefas, novaTarefa],
-        novaTarefa: ''
-    })
+        novaTarefa: '',
+      })
     } else {
-      novaTarefas[index] = novaTarefa
+      novaTarefas[index] = novaTarefa;
 
       this.setState({
         tarefas: [...novaTarefas],
@@ -44,8 +63,8 @@ export default class Main extends Component{
     }
   }
 
-  handleEdit = (e, index)=>{
-    const {tarefas} = this.state;
+  handleEdit = (e, index) => {
+    const { tarefas } = this.state;
 
     this.setState({
       index,
@@ -53,8 +72,8 @@ export default class Main extends Component{
     })
   }
 
-  handleDelete = (e, index)=>{
-    const {tarefas} = this.state;
+  handleDelete = (e, index) => {
+    const { tarefas } = this.state;
     const novaTarefas = [...tarefas];
     novaTarefas.splice(index, 1);
 
@@ -63,34 +82,24 @@ export default class Main extends Component{
     })
   }
 
-  render(){
-    const {novaTarefa, tarefas} = this.state;
+  render() {
+    const { novaTarefa, tarefas } = this.state;
 
-    return(
-      <div className = "main">
+    return (
+      <div className="main">
         <h1>Lista de Tarefas</h1>
 
-        <form onSubmit={this.handleSubmit} action="#" className='form'>
-          <input
-          onChange={this.handleChange}
-          type="text"
-          value={novaTarefa}
-          />
-          <button type="submit">
-            <FaPlus />
-            </button>
-        </form>
+        <Form
+          handleSubmit={this.handleSubmit}
+          handleChange={this.handleChange}
+          novaTarefa={novaTarefa}
+        />
 
-        <ul className="tarefas">
-          {tarefas.map((tarefa, index)=>(
-            <li key={tarefa}>{tarefa}
-            <div>
-              <FaEdit onClick={(e) => this.handleEdit(e, index)} className="edit"/>
-              <FaWindowClose onClick = {(e) => this.handleDelete(e, index)} className="delete"/>
-            </div>
-            </li>
-          ))}
-        </ul>
+        <Tarefas
+          tarefas={tarefas}
+          handleEdit={this.handleEdit}
+          handleDelete={this.handleDelete}
+        />
 
       </div>
     )
